@@ -2,6 +2,7 @@
 const db = require('./DB/firestore');
 const seek = require('./Seek.com/main.js');
 const indeed = require('./Indeed.com/main.js');
+const trademe = require('./tradeMe.com/main.js');
 const uoa = require('./UoA.com/main.js');
 const aut = require('./AUT.com/main.js');
 const controller = require('./global_controller');
@@ -35,7 +36,8 @@ async function run(close) {
 		
 	//controller.writeCategoriesFromSeekData();	
 	
-	indeed.go(page, close);
+	trademe.go(page, close);
+	//indeed.go(page, close);
 	//seek.go(page, close);
 	//uoa.go(page, close);
     //aut.go(page, close);//requires student username

@@ -93,6 +93,10 @@ exports.getAllSearchTerms = async function(){
 			subcategory: doc.data()
 		});
 	}
+	console.log("------------------------------------------");
+	console.log("FINISHED READING FROM DB");
+	console.log("------------------------------------------");
+	
 	return categories;
 
 }
