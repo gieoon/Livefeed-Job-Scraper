@@ -9,3 +9,8 @@ exports.asyncForEach = async function(array, callback){
 exports.getArrayOfSelectOptions = async function(){
 	
 }
+
+//dont need this for now...maybe after 5.
+exports.getIframeFromUrl = async function(url){
+	//await 
+}

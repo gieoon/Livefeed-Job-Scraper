@@ -1,7 +1,10 @@
 //local imports
+const db = require('./DB/firestore');
 const seek = require('./Seek.com/main.js');
+const indeed = require('./Indeed.com/main.js');
 const uoa = require('./UoA.com/main.js');
-
+const aut = require('./AUT.com/main.js');
+const controller = require('./global_controller');
 //library imports
 const puppeteer = require('puppeteer');
 var browser = null;
@@ -28,14 +31,14 @@ async function run(close) {
 
     // Adaptive?
     // await page.setUserAgent('Mozilla (Android) Mobile')
-    
-   
-
     await page.setViewport({ width, height });;
+		
+	//controller.writeCategoriesFromSeekData();	
 	
-
+	indeed.go(page, close);
 	//seek.go(page, close);
-	uoa.go(page, close);
+	//uoa.go(page, close);
+    //aut.go(page, close);//requires student username
 }
 
 
@@ -53,26 +56,3 @@ run(function(){
 		count = 0;
 	}
 });
-
-resize = async () => {
-
-    // Viewport && Window size
-    const width = 400
-    const height = 600
-
-    const browser = await puppeteer.launch({
-        headless: false,
-        args: [
-            `--window-size=${ width },${ height }`
-        ],
-    });
-
-    const page = await browser.newPage();
-
-    // Adaptive?
-    // await page.setUserAgent('Mozilla (Android) Mobile')
-    
-   
-
-    return await page.setViewport({ width, height });;
-}

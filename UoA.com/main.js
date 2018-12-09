@@ -1,8 +1,13 @@
 const urls = require('../constants').urls;
 const elements = require('./elements');
 const main_helpers = require('../helpers/main_helpers');
+const db_helper = require('./controller');
 
 exports.go = async function(page, close) {
+
+	//generate unique instance of DB for this scrape
+	const pushId = Date.now().toString();
+	console.log('uniqueId: ' + pushId);
 
 	await page.goto(urls.UOA_DB); 
 
@@ -32,7 +37,7 @@ exports.go = async function(page, close) {
 	const options = await yearSelect.$$('option');
 	//await formFrame.waitForSelector('select#year > option');
 	//await page.waitForNavigation();
-	//await page.waitFor(1000);
+	//await page.waitFor(1000); //necessary
 
 	const years = await formFrame.evaluate((length) => {
 		const tempValues = [];
@@ -41,29 +46,57 @@ exports.go = async function(page, close) {
 		}
 		return tempValues;
 	}, options.length);
-	//console.log('values: ', values);
 	
 	//set year to newest year for now
-	await formFrame.select('select#year', years[0]);
-	//for(var i = 0; i < qualifications.length; i++){
-		//select each qualification for each year;
-		await formFrame.select('select#qualCode', qualifications[0]);
-		//click 'search'
-		const btn = await formFrame.waitForSelector('input#searchBtn');
-		btn.click();
+	//if same no of grads...because iframe doesnt refresh, the don't count, makeshift solution
+	var currentNo = 0;
+	for(var y = 0; y < years.length; y++){
+		for(var i = 0; i < qualifications.length; i++){
+			//select each qualification for each year;
+			await formFrame.select('select#year', years[y]);
+			await formFrame.select('select#qualCode', qualifications[i]);
+			//click 'search'
+			const btn = await formFrame.waitForSelector('input#searchBtn');
+			btn.click();
+			//await page.waitFor(100);
 
-		//get the result from the bottom
-		const gradDiv = await formFrame.waitForSelector('#graduationPagination');
-		//console.log("gradDiv: ", gradDiv);
-		//console.dir(gradDiv);
-		//const noOfGrads = formFrame.evaluate(() => document.querySelector('span'));
-		const span = await formFrame.waitForSelector('span > b');
-		//const noOfGrads = await formFrame.$$('span');
-		
-		const noOfGrads = await formFrame.evaluate(()=> document.querySelectorAll('span > b')[2].innerHTML);
-		//console.log("span: ", span);
-		console.log("noOfGrads:", noOfGrads);
-	//}
+			//get the result from the bottom
+			const gradDiv = await formFrame.waitForSelector('#graduationPagination');
+
+			const span = await formFrame.waitForSelector('span > b');
+			
+			var noOfGrads = await formFrame.evaluate(()=> document.querySelectorAll('span > b')[2].innerHTML);
+			if(noOfGrads == currentNo){
+				noOfGrads = 0;
+			}
+			else {
+				//set new number;
+				currentNo = noOfGrads;
+			}
+
+			// var qualTitle = '';
+			// if(i === 0){
+			// 	qualTitle = 'total'
+			// }
+			//else{
+				qualTitle = await formFrame.evaluate(() => 
+					document.querySelectorAll('div#searchQuery> b')[1].innerHTML
+				);
+			//}
+			
+			console.log('qual title: ' + qualTitle);
+			console.log("noOfGrads:", noOfGrads);
+
+			var data = {
+				pushId: pushId,
+				year: years[y],
+				qualification: qualTitle.replace(/\//g, '-'), // /g means replace every value, and replace the slash, escaped with backslash
+				noOfGrads: noOfGrads
+			}
+
+			db_helper.writeStudentsInYear(data);
+		}
+	}
 	
 
 	//options[0].click();
