@@ -11,9 +11,10 @@ const puppeteer = require('puppeteer');
 var browser = null;
 var count = 0;
 const FINISH_VAL = 2;
+const startTime = Date.now();
 
 async function run(close) {
-	console.log("launching");
+	console.log("================== LAUNCHING ===================");
 	//browser = await puppeteer.launch({ headless: false });
 	//const page = await browser.newPage();
 
@@ -32,29 +33,34 @@ async function run(close) {
 
     // Adaptive?
     // await page.setUserAgent('Mozilla (Android) Mobile')
-    await page.setViewport({ width, height });;
+    await page.setViewport({ width, height });
 		
 	//controller.writeCategoriesFromSeekData();	
-	
-	trademe.go(page, close);
-	//indeed.go(page, close);
-	//seek.go(page, close);
-	//uoa.go(page, close);
+
+	//Job Listings
+	//await trademe.go(page, close);
+	//await indeed.go(page, close);
+	await seek.go(page, close);
+	//DB
+	//await uoa.go(page, close);
     //aut.go(page, close);//requires student username
+    close();
 }
 
-
-
 async function close() {
+	console.log('------------------------------------------------------');
+	console.log("FINISHED EXECUTION SUCCESSFULLY");
+	console.log("Duration elapsed: ", Date.now() - startTime);
+	console.log('------------------------------------------------------');
 	await browser.close();
 }
 
 run(function(){
 	//if all pages finished, then close
 	//can use a count value;
-	++count;
-	if(count >= 2){
-		close();
-		count = 0;
-	}
+	// ++count;
+	// if(count >= 2){
+	// 	close();
+	// 	count = 0;
+	// }
 });

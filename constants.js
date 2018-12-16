@@ -12,6 +12,7 @@ module.exports = {
 
 	collections : {
 		CATEGORIES: 'Job Categories',
+		UAT: 'UAT',
 		TRADEME: 'TradeMe',
 		SEEK: 'SEEK-NZ',
 		UOA: 'UoA',

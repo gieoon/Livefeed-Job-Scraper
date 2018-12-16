@@ -101,17 +101,50 @@ exports.getAllSearchTerms = async function(){
 
 }
 
-	//or define promise directly here and use promise.then()
-		// db.collection(addresses.CATEGORIES)
-		// 	.get()
-		// 	.then(snapshot => {
-		// 		snapshot.map(async doc => {
-		// 			categories.push({
-		// 				category: doc.id, a
-		// 				subcategory: doc.data()});
-		// 		});
-		// 		console.log("returning");
-		// 		return categories;
-		// 	});
+//how all scrapers write their data
+//one big category at a time
+exports.writeBigCategoryWithSmallCategories = function(data, address){
+	console.log("===========WRITING TO DB============")
+	console.log('data: ', data);
+	const db = require('./DB/firestore');
+	var bigRef = db.collection('UAT')//address)
+				   .doc(data.pushId)
+				   .collection('Categories')
+				   .doc(data.bigCategory);
+				   
+	//save preliminary big category information here
+	bigRef.set({
+		totalJobCount: data.totalJobCount
+	});
+
+	//save sub-categories
+	for(var i = 0; i < data.subCategories.length; i++){
+		bigRef.collection('SubCategory')
+			  .doc(data.subCategories[i].subCategory)
+			  .set({
+			  		jobCount: data.subCategories[i].subCategoryJobCount,
+			  		averageSalary:  data.subCategories[i].salaries,
+			   		locations: data.subCategories[i].locations
+			  });
+	}
+	console.log("===========FINISHED WRITING TO DB SUCCESSFULLY ==================");
+}
+
+exports.writeSalaryLocationJobCountForSubcategory = function(data, address){
+	console.log('================ WRITING LOCATION TO DB ===================');
+	console.log('data: ', data);
+	const db = require('./DB/firestore');
+	var bigRef = db.collection('UAT')//address
+				   .doc(data.pushId)
+				   .collection('Categories')
+				   .doc(data.bigCategory)
+				   .collection('SubCategory')
+				   .doc(data.subCategory)
+				   .set({
+				   		averageSalary:  data.salaries,
+				   		locations: data.locations,
+				   		jobCount: data.subCategoryJobCount
+				   });
+}
 
 

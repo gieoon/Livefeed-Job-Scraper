@@ -1,7 +1,8 @@
-
-const urls = require('../constants').urls;
-const db_helper = require('./controller');
+const constants = require('../constants');
+const urls = constants.urls;
+//const db_helper = require('./controller');
 const global_db_helper = require('../global_controller');
+const address = constants.collections.TRADEME;
 
 exports.go = async function(page, close){
 
@@ -25,20 +26,21 @@ exports.go = async function(page, close){
 			const jobCount = await search(page, subcategory);
 			subcategoriesData.push({
 				subCategory: subcategory,
-				jobCount: jobCount
+				subCategoryJobCount: jobCount
 			});
 		}
-				console.log('-------------------------------------------');
+		console.log('-------------------------------------------');
 		console.log("WRITING TO DB");
-		db_helper.writeBigCategoryWithSmallCategories({
-			pushId, pushId,
-			category: category,
+		global_db_helper.writeBigCategoryWithSmallCategories({
+			pushId: pushId,
+			bigCategory: category,
 			totalJobCount: totalJobCount,
 			subCategories: subcategoriesData
-		});
+		}, address);
 		console.log("WRITING TO DB COMPLETED SUCCESSFULLY");
 
 	}
+	return;
 }
 
 async function search(page, searchTerm){
